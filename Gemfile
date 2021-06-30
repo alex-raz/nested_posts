@@ -17,5 +17,9 @@ end
 
 group :development do
   gem 'listen', '~> 3.3' # istens to file modifications and notifies you about the changes
+  gem 'rubocop', require: false # Ruby code linter
+  gem 'rubocop-performance' # rubocop extension focused on code performance checks.
+  gem 'rubocop-rails' # rubocop extension for Rails
+  gem 'rubocop-rspec' # Code style checking for RSpec files
   gem 'spring' # speeds up development by keeping your application running in the background
 end
