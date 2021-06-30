@@ -23,6 +23,7 @@ group :development, :test do
 end
 
 group :development do
+  gem 'annotate' # Annotate Rails classes with schema and routes info
   gem 'listen', '~> 3.3' # istens to file modifications and notifies you about the changes
   gem 'rubocop', require: false # Ruby code linter
   gem 'rubocop-performance' # rubocop extension focused on code performance checks.
