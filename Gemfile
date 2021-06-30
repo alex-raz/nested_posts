@@ -9,6 +9,12 @@ gem 'puma', '~> 5.0' # the app server
 gem 'rails', '~> 6.1.0'
 gem 'sass-rails', '>= 6' # SCSS for stylesheets
 
+group :development, :test do
+  gem 'pry-byebug' # neat debugger
+  gem 'pry-rails' # causes rails console to open pry.
+  gem 'pry-stack_explorer' # Walk the stack in a Pry session
+end
+
 group :development do
   gem 'listen', '~> 3.3' # istens to file modifications and notifies you about the changes
   gem 'spring' # speeds up development by keeping your application running in the background
