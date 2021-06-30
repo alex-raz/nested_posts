@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
@@ -10,6 +12,7 @@ gem 'rails', '~> 6.1.0'
 gem 'sass-rails', '>= 6' # SCSS for stylesheets
 
 group :development, :test do
+  gem 'bullet' # helps to kill N+1 queries and unused eager loading
   gem 'factory_bot_rails' # ..is a fixtures replacement with a straightforward definition syntax
   gem 'faker' # Generates fake data.
   gem 'guard' # command line tool to easily handle events on file system modifications
