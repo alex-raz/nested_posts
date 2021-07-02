@@ -10,6 +10,12 @@
   </head>
 
   <body>
+    <h1>Nested Posts</h1>
+
+    <% unless current_page?(root_path) %>
+      <%= link_to 'Home', root_path %>
+    <% end %>
+
     <%= yield %>
   </body>
 </html>

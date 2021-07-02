@@ -1,0 +1,11 @@
+<% if @posts.any? %>
+  <nav>
+    <ul>
+      <% @posts.each do |post| %>
+        <li>
+          <%= link_to post.title, parent_post_path(post.slug) %>
+        </li>
+      <% end %>
+    </ul>
+  <nav>
+<% end %>
