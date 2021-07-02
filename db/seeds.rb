@@ -18,6 +18,7 @@ parent_post = FactoryBot.create(:post)
 
 section = FactoryBot.create(:section, name: Faker::University.suffix, post: parent_post)
 FactoryBot.create(:post, parent: parent_post, section: section)
+parent_post.update(section_id: section.id)
 
 section2 = FactoryBot.create(:section, name: Faker::University.suffix, post: parent_post)
 2.times { FactoryBot.create(:post, parent: parent_post, section: section2) }

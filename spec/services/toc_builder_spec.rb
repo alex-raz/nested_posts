@@ -11,6 +11,7 @@ RSpec.describe TocBuilder, type: :service do
     it 'builds Table of Contents for a given Parent Post' do
       parent = create(:post, title: 'Parent Post', position: 1, published: true)
       section2 = create(:section, post: parent, name: 'Second Section', position: 2)
+      parent.update(section: section2) # add parent post to the second section
       child1 = create(
         :post, title: 'Child 1', position: 2, published: true, section: section2, parent: parent
       )
@@ -84,6 +85,12 @@ RSpec.describe TocBuilder, type: :service do
             name: 'Second Section',
             type: 'section',
             posts: [
+              {
+                id: parent.id,
+                link: '/parent-post',
+                name: 'Parent Post',
+                type: 'post'
+              },
               {
                 id: child1.id,
                 name: 'Child 1',

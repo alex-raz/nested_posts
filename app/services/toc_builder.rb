@@ -19,7 +19,16 @@ class TocBuilder
   private
 
   def sectionless_posts
-    @post.children.published.sectionless.order(position: :asc)
+    posts.sectionless.order(position: :asc)
+  end
+
+  def posts
+    Post
+      .where(id: @post.id)
+      .or(
+        Post.where(id: @post.children.published)
+      )
+      .order(position: :asc)
   end
 
   def sections
@@ -40,11 +49,13 @@ class TocBuilder
   end
 
   def represented_post(post)
+    link = post.parent? ? parent_post_path(post.slug) : child_post_path(@post.slug, post.slug)
+
     {
       id: post.id,
       name: post.title,
       type: 'post',
-      link: child_post_path(@post.slug, post.slug)
+      link: link
     }
   end
 end
