@@ -1,0 +1,23 @@
+<% if toc&.any? %>
+  <nav class='toc'>
+    <ul>
+      <% toc.map do |toc_item| %>
+        <% if toc_item[:type] == 'section' %>
+          <li>
+            <h3><%= toc_item[:name] %></h3>
+
+            <ul>
+              <% toc_item[:posts].map do |post| %>
+                <li>
+                  <h4><%= link_to post[:name], post[:link] %></h4>
+                </li>
+              <% end %>
+            </ul>
+          </li>
+        <% else %>
+          <h4><%= link_to toc_item[:name], toc_item[:link] %></h4>
+        <% end %>
+      <% end %>
+    </ul>
+  </nav>
+<% end %>
