@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Post < ApplicationRecord
+  before_destroy :check_if_post_is_destroyable
+
   belongs_to :parent, class_name: 'Post', optional: true
   has_many(
     :children,
@@ -18,6 +20,19 @@ class Post < ApplicationRecord
 
   def parent?
     parent_id.nil?
+  end
+
+  private
+
+  def check_if_post_is_destroyable
+    destroyable = children.blank? && sections.blank?
+    return true if destroyable
+
+    errors.add(:base, 'You may not delete this Parent Post.')
+
+    # Returning false in Active Record and Active Model callbacks
+    # will not implicitly halt a callback chain starting from Rails 5.1
+    throw :abort
   end
 end
 

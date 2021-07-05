@@ -10,9 +10,12 @@ class TocBuilder
   def call
     return unless @post.parent?
 
+    # Perhaps it is not a good idea to display ToC for just a single post
+    return if posts.count < 2
+
     [
       sectionless_posts.map { |post| represented_post(post) },
-      sections.map { |section| represented_section(section) }
+      sections.map { |section| represented_section(section) }.compact
     ].flatten
   end
 
@@ -23,7 +26,8 @@ class TocBuilder
   end
 
   def posts
-    Post
+    @posts ||=
+      Post
       .where(id: @post.id)
       .or(
         Post.where(id: @post.children.published)
@@ -36,6 +40,9 @@ class TocBuilder
   end
 
   def represented_section(section)
+    # Perhaps it is not a good idea to display a Section w/o posts
+    return nil unless section.posts.any?
+
     {
       id: section.id,
       name: section.name,

@@ -109,12 +109,130 @@ RSpec.describe TocBuilder, type: :service do
       )
     end
 
-    context 'when given post is a Child' do
-      it 'returns nil' do
-        parent = create(:post)
-        child = create(:post, parent: parent)
+    describe 'corner cases' do
+      describe 'empty ToC' do
+        specify 'when given post is a Child' do
+          parent = create(:post)
+          child = create(:post, parent: parent)
 
-        expect(method_call(child)).to eq(nil)
+          expect(method_call(child)).to eq(nil)
+        end
+
+        specify 'post that belongs to a Parent Section without child posts and sections' do
+          parent = create(:post, title: 'Parent Post', position: 1, published: true)
+          section2 = create(:section, post: parent, name: 'Second Section', position: 2)
+          parent.update(section: section2) # add parent post to the second section
+
+          result = method_call(parent)
+
+          expect(result).to eq(nil)
+        end
+
+        specify 'standalone post' do
+          parent = create(:post, title: 'Parent Post', position: 1, published: true)
+
+          result = method_call(parent)
+
+          expect(result).to eq(nil)
+        end
+      end
+
+      specify 'section(s) w/o posts inside them' do
+        parent = create(:post, title: 'Parent Post', position: 1, published: true)
+        child1 = create(
+          :post, title: 'Child 1', position: 2, published: true, parent: parent
+        )
+        create(:section, post: parent, name: 'First Section', position: 1)
+        create(:section, post: parent, name: 'Second Section', position: 2)
+
+        result = method_call(parent)
+
+        expect(result).to eq(
+          [
+            {
+              id: parent.id,
+              link: '/parent-post',
+              name: 'Parent Post',
+              type: 'post'
+            },
+            {
+              id: child1.id,
+              link: '/parent-post/child-1',
+              name: 'Child 1',
+              type: 'post'
+            }
+          ]
+        )
+      end
+
+      specify 'accidental section destroying' do
+        parent = create(:post, title: 'Parent Post', position: 1, published: true)
+        section2 = create(:section, post: parent, name: 'Second Section', position: 2)
+        parent.update(section: section2) # add parent post to the second section
+        child1 = create(
+          :post, title: 'Child 1', position: 2, published: true, section: section2, parent: parent
+        )
+        # inital ToC state
+        expect(method_call(parent)).to eq(
+          [
+            {
+              id: section2.id,
+              name: 'Second Section',
+              type: 'section',
+              posts: [
+                {
+                  id: parent.id,
+                  link: '/parent-post',
+                  name: 'Parent Post',
+                  type: 'post'
+                },
+                {
+                  id: child1.id,
+                  link: '/parent-post/child-1',
+                  name: 'Child 1',
+                  type: 'post'
+                }
+              ]
+            }
+          ]
+        )
+
+        section2.destroy
+
+        expect(method_call(parent)).to eq(
+          [
+            {
+              id: parent.id,
+              link: '/parent-post',
+              name: 'Parent Post',
+              type: 'post'
+            },
+            {
+              id: child1.id,
+              link: '/parent-post/child-1',
+              name: 'Child 1',
+              type: 'post'
+            }
+
+          ]
+        )
+      end
+
+      # (though technically this spec belongs to the Model layer)
+      # I decided to leave it here to keep all the known 'corner cases' in a single place
+      specify 'accidental parent post destroying' do
+        parent = create(:post, title: 'Parent Post', position: 1, published: true)
+        section2 = create(:section, post: parent, name: 'Second Section', position: 2)
+        parent.update(section: section2) # add parent post to the second section
+        create(
+          :post, title: 'Child 1', position: 2, published: true, section: section2, parent: parent
+        )
+
+        parent.destroy
+
+        expect(Section.find_by(name: 'Second Section')).to be_persisted
+        expect(Post.find_by(title: 'Child 1')).to be_persisted
+        expect(parent.errors.first.full_message).to eq('You may not delete this Parent Post.')
       end
     end
   end
